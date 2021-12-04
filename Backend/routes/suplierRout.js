@@ -14,6 +14,7 @@ class SuplierRouter {
         this.router.put('/supliers/', supC.update);
         this.router.delete('/supliers/', supC.delete);
         this.router.get('/countedsupliers', supC.count);
+        this.router.get('/sortedsupliers', supC.getSorted);
     }
 }
 /*  

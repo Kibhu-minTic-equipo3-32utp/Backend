@@ -1,87 +1,78 @@
 const productModel = require("../models/product.model");
 
-module.exports = class ProductApi {
-  static async getAll(req, res) {
-    try {
-      const products = await productModel.find();
-      res.status(200).json(products);
-    } catch (err) {
-      res.status(404).json({ message: err.message });
-    }
+class ProductController {
+  getAll = (req, res)=>{
+      productModel.find((error, docs) => {
+          if(error){
+              res.status(500).json({error});
+          }else{
+              res.status(200).json(docs);
+          }
+      });
   }
-  static async count(req, res) {
-    try {
-        const countproduct = await productModel.estimatedDocumentCount()
-        res.status(200).json(countproduct); 
-    } catch (err) {
-        res.status(404).json({ message: err.message});
-    }
+  getSorted = (req, res) => {
+      productModel.find((error, docs) => {
+          if(error){
+              res.status(500).json({error})
+          }else{
+              res.status(200).json(docs)
+          }
+      }).sort({date: -1}).limit(5)
+  }
+  getByCode = (req, res)=> {
+          let reference = req.params.reference;
+          productModel.findOne( {"reference": reference}, (error, docs) => {
+              if(error){
+                  res.status(500).json({error});
+              }else{
+                  res.status(200).json(docs);
+              }
+          } );
+          
+  }
+  create = (req, res)=>{
+      let {reference, name, description, stock, pricein, priceout, category} = req.body;
+      productModel.create({reference, name, description, stock, pricein, priceout, category}, (error, docs) => {
+          if(error){
+              res.status(500).json({error});
+          }else{
+              res.status(201).json(docs);
+          }
+      });
+  }
+  update = (req, res)=>{
+      let {reference, name, description, stock, pricein, priceout, category} = req.body;
+      productModel.findOneAndUpdate({"reference": reference}, {nreference, name, description, stock, pricein, priceout, category}, (error, docs) => {
+          if(error){
+              res.status(500).json({error});
+          }else{
+              res.status(200).json({info: 'Producto actualizado'});
+          }
+      });
+  }
+  delete = (req, res)=>{
+      let {reference} = req.body;
+      productModel.findOneAndRemove({"reference": reference},  (error, doc) => {
+          if(error){
+              res.status(500).json({error});
+          }else{
+              if(doc){
+                  res.status(200).json({removed: true})
+              }else{
+                  res.status(200).json({removed: false})
+              }
+          }
+      });
+  }
+  count = (req, res) => {
+      productModel.estimatedDocumentCount((error, docs) => {
+          if(error){
+              res.status(500).json({error});
+          }else{
+              res.status(200).json(docs);
+          }
+      })
+  }
+
 }
-  static async getByCode(req, res) {
-    try {
-      const reference = req.params.reference;
-      const product = await productModel.findOne({ reference: reference });
-      if (product == null) {
-        res.status(404).json({ message: "No encontrado en la base de datos" });
-      } else {
-        res.status(200).json(product);
-      }
-    } catch (err) {
-      res.status(400).json({ message: err.message });
-    }
-  }
-  static async create(req, res) {
-    try {
-      let product = req.body;
-      if (req.file != undefined) {
-        const imageName = req.file.filename;
-        product.imageUrl = "/" + imageName;
-      }
-      if (product.reference == undefined) {
-        res
-          .status(400)
-          .json({ message: "Producto no puede ser guardado sin codigo" });
-      } else {
-        if (typeof product.categories === "string") {
-          product.categories = JSON.parse(product.categories);
-        }
-        product = await productModel.create(product);
-        res.status(201).json(product);
-      }
-    } catch (err) {
-      res.status(400).json({ message: err.message });
-    }
-  }
-  static async update(req, res) {
-    try {
-      const reference = req.params.reference;
-      const product = req.body;
-      await productModel.updateOne({ reference: reference }, product);
-      res.status(200).json();
-    } catch (err) {
-      res.status(400).json({ message: err.message });
-    }
-  }
-  static async delete(req, res) {
-    try {
-      const reference = req.params.reference;
-      await productModel.deleteOne({ reference: reference });
-      res.status(200).json();
-    } catch (err) {
-      res.status(400).json({ message: err.message });
-    }
-  }
-  static async changeProductImage(req, res) {
-    try {
-      const code = req.params.code;
-      const imageName = req.file.filename;
-      await productModel.updateOne(
-        { code: code },
-        { imageUrl: "/" + imageName }
-      );
-      res.status(200).json();
-    } catch (err) {
-      res.status(400).json({ message: err.message });
-    }
-  }
-};
+module.exports = ProductController

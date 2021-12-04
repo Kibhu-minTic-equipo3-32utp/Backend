@@ -9,16 +9,14 @@ mongoose.SchemaTypes.Email.defaults.message = 'dirección de mail invalida'
 
 // MODELO DE USUARIOS
 const userSchema = mongoose.Schema({
-    name: {
-        first: {
-            type: String,
-            required: [true, 'Por favor digite un nombre']
+    firstname: {
+        type: String,
+        required: [true, 'Por favor digite un nombre']
         },
-        last: {
-            type: String,
-            required: [true, 'Por favor digite un apellido']
-        }
-    },
+    lastname: {
+        type: String,
+        required: [true, 'Por favor digite un apellido']
+        },
     mail: mongoose.SchemaTypes.Email,
 
     contact: {
@@ -48,10 +46,7 @@ const userSchema = mongoose.Schema({
 
 
 
-//Esto es para que me retorne el nombre completo
-userSchema.virtual('fullName').get(function () {
-    return this.name.first + '' + this.name.last;
-});
+
 
 //hasta aquí todo lo que es de usuarios
 

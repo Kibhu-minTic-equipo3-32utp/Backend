@@ -10,6 +10,15 @@ class SuplierController {
             }
         });
     }
+    getSorted = (req, res) => {
+        suplierModel.find((error, docs) => {
+            if(error){
+                res.status(500).json({error})
+            }else{
+                res.status(200).json(docs)
+            }
+        }).sort({date: -1}).limit(5)
+    }
     getByCode = (req, res)=> {
             let ruc = req.params.ruc;
             suplierModel.findOne( {"ruc": ruc}, (error, docs) => {
