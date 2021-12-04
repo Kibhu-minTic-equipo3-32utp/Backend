@@ -1,10 +1,25 @@
-const express = require("express");
+const { Router} = require ("express");
+const SuplierController = require("../controllers/Suplier.ctrl");
+
+class SuplierRouter {
+    constructor() {
+        this.router = Router();
+        this.config();
+    }
+    config() {
+        const supC = new SuplierController();
+        this.router.get('/supliers', supC.getAll);
+        this.router.get('/supliers/:ruc', supC.getByCode);
+        this.router.post('/supliers', supC.create);
+        this.router.put('/supliers/', supC.update);
+        this.router.delete('/supliers/', supC.delete);
+        this.router.get('/countedsupliers', supC.count);
+    }
+}
+/*  
 const clientController = require("../controllers/Client.ctrl");
 const productController = require("../controllers/Product.ctrl");
 const userController = require("../controllers/User.ctrl");
-const suplierController = require("../controllers/Suplier.ctrl");
-const router = express.Router();
-
 // Client Routes
 router.get("/clients", clientController.getAll);
 
@@ -28,7 +43,7 @@ router.get("/products/:reference", productController.getByCode);
 router.post("/products", productController.create);
 router.put("/products/:reference", productController.update);
 router.delete("/products/:reference", productController.delete);
-// Fin Products route
+// Fin Products route 
 
 // Users Routes
 router.get("/users", userController.getAll);
@@ -44,11 +59,11 @@ router.put("/users/:username", userController.update);
 router.delete("/users/:username", userController.delete);
 
 router.post("/authenticate", userController.validateUser);
-// Fin Users route
+// Fin Users route */
 
 // supliers routes
-router.get("/supliers", suplierController.getAll);
 
+/*  
 router.get("/countedsupliers", suplierController.count);
 
 router.get("/supliers/:ruc", suplierController.getByCode);
@@ -57,6 +72,6 @@ router.post("/supliers", suplierController.create);
 
 router.put("/supliers/:ruc", suplierController.update);
 
-router.delete("/supliers/:ruc", suplierController.delete);
+router.delete("/supliers/:ruc", suplierController.delete);*/
 
-module.exports = router;
+module.exports = SuplierRouter;

@@ -1,61 +1,69 @@
 const suplierModel = require("../models/suplier.model")
 
-module.exports = class SuplierApi {
-    static async getAll(req, res) {
-        try {
-            const supliers = await suplierModel.find();
-            res.status(200).json(supliers); 
-        } catch (err) {
-            res.status(404).json({ message: err.message});
-        }
+class SuplierController {
+    getAll = (req, res)=>{
+        suplierModel.find((error, docs) => {
+            if(error){
+                res.status(500).json({error});
+            }else{
+                res.status(200).json(docs);
+            }
+        });
     }
-    static async count(req, res) {
-        try {
-            const countsuplier = await suplierModel.estimatedDocumentCount()
-            res.status(200).json(countsuplier); 
-        } catch (err) {
-            res.status(404).json({ message: err.message});
-        }
+    getByCode = (req, res)=> {
+            let ruc = req.params.ruc;
+            suplierModel.findOne( {"ruc": ruc}, (error, docs) => {
+                if(error){
+                    res.status(500).json({error});
+                }else{
+                    res.status(200).json(docs);
+                }
+            } );
+            
     }
-    static async getByCode(req, res) {
-        try {
-            const ruc = req.params.ruc;
-            const suplier = await suplierModel.findOne( {"ruc": ruc}  );
-            if(suplier == null) {
-                res.status(404).json({message: "Not found"}  );
-            } else {
-                res.status(200).json(suplier);
-            }            
-        } catch (err){
-            res.status(400).json({ message: err.message});
-        }
+    create = (req, res)=>{
+        let {name, mail, contact, ruc} = req.body;
+        suplierModel.create({name, mail, contact, ruc}, (error, docs) => {
+            if(error){
+                res.status(500).json({error});
+            }else{
+                res.status(201).json(docs);
+            }
+        });
     }
-    static async create(req, res) {
-        try {
-            let suplier = req.body;
-            suplier = await suplierModel.create(suplier);
-            res.status(201).json(suplier);
-        } catch (err){
-            res.status(400).json({message: err.message})
-        }
+    update = (req, res)=>{
+        let {name, mail, contact, ruc} = req.body;
+        suplierModel.findOneAndUpdate({"ruc": ruc}, {name, mail, contact, ruc}, (error, docs) => {
+            if(error){
+                res.status(500).json({error});
+            }else{
+                res.status(200).json({info: 'Proveedor actualizado'});
+            }
+        });
     }
-    static async update (req, res) {
-        try {
-            const ruc = req.params.ruc;
-            const suplier = req.body;
-            await suplierModel.updateOne( {ruc: ruc}, suplier );
-            res.status(200).json()
-        } catch (err) {
-            res.status(400).json({message: err.message})
-        }
+    delete = (req, res)=>{
+        let {ruc} = req.body;
+        suplierModel.findOneAndRemove({"ruc": ruc},  (error, doc) => {
+            if(error){
+                res.status(500).json({error});
+            }else{
+                if(doc){
+                    res.status(200).json({removed: true})
+                }else{
+                    res.status(200).json({removed: false})
+                }
+            }
+        });
     }
-    static async delete (req, res) {
-        try {
-            const ruc = req.params.ruc;
-            await suplierModel.deleteOne( {ruc: ruc}, );
-            res.status(200).json()
-        } catch (err) {
-            res.status(400).json({message: err.message})
-        }
+    count = (req, res) => {
+        suplierModel.estimatedDocumentCount((error, docs) => {
+            if(error){
+                res.status(500).json({error});
+            }else{
+                res.status(200).json(docs);
+            }
+        })
     }
+
 }
+module.exports = SuplierController

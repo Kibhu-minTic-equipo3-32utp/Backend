@@ -4,6 +4,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors'); //habilitar la conexión desde cualquier fuente
 
+const SuplierRouter = require('./routes/suplierRout')
 
 const app = express();
 app.use(cors());
@@ -18,7 +19,14 @@ mongoose.connect(process.env.DB_URI)
 
 
 //definir rutas
-app.use("/api", require("./routes/routes"));
+let router = express.Router();
+router.get('/', (req, res) => {
+    res.status(200).json({message: 'Todo OK'});
+});
+let suplierR = new SuplierRouter();
+app.use(router);
+app.use(suplierR.router);
+
 
 
 //iniciar servidor
